@@ -1,6 +1,8 @@
 package com.virtualidentity.vitinyurl.entity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -26,13 +28,13 @@ public class User {
 
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(name = "users_tinyUrls", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "tinyurl_id", referencedColumnName = "id"))
-	Set<TinyURL> tinyUrls;
+	List<TinyURL> tinyUrls;
 
-	public Set<TinyURL> getTinyUrls() {
+	public List<TinyURL> getTinyUrls() {
 		return tinyUrls;
 	}
 
-	public void setTinyUrls(Set<TinyURL> tinyUrls) {
+	public void setTinyUrls(List<TinyURL> tinyUrls) {
 		this.tinyUrls = tinyUrls;
 	}
 
@@ -63,7 +65,7 @@ public class User {
 	public void addTinyURL(TinyURL tinyURL) {
 		if (tinyURL != null) {
 			if (tinyUrls == null) {
-				tinyUrls = new HashSet<>();
+				tinyUrls = new ArrayList<>();
 			}
 			Set<User> users = new HashSet<>();
 			users.add(this);
@@ -71,23 +73,5 @@ public class User {
 			tinyUrls.add(tinyURL);
 		}
 
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(email, tinyUrls, userName);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		User other = (User) obj;
-		return Objects.equals(email, other.email) && Objects.equals(tinyUrls, other.tinyUrls)
-				&& Objects.equals(userName, other.userName);
 	}
 }

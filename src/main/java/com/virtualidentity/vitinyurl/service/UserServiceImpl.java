@@ -1,5 +1,9 @@
 package com.virtualidentity.vitinyurl.service;
 
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,11 +14,12 @@ import com.virtualidentity.vitinyurl.entity.User;
 import com.virtualidentity.vitinyurl.exception.JWTTokenNotFoundException;
 import com.virtualidentity.vitinyurl.model.TinyURLDTO;
 import com.virtualidentity.vitinyurl.repository.UserRepository;
+
 @Service
 public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
-	
+
 	@Autowired
 	NewUserService newUserService;
 	@Autowired
@@ -25,7 +30,7 @@ public class UserServiceImpl implements UserService {
 	public UserServiceImpl(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
-	
+
 	@Override
 	public GlobalTinyURL createShortenUrl(TinyURLDTO tinyURLDTO) {
 		GlobalTinyURL globalTinyURL = globalTinyURLService.getGlobalTinyURL(tinyURLDTO.getOriginalUrl(),true);
@@ -57,19 +62,28 @@ public class UserServiceImpl implements UserService {
 			}
 			
 			User user = userRepository.findByEmail(email);
+			TinyURL tinyURL = null;
 			if (user == null) {
 				user = new User();
 				user.setEmail(email);
 				user.setUserName(username);
+				
+			}else {
+				String shortUrl = globalTinyURL.getShortUrl();
+				List<TinyURL> tinyUrls = user.getTinyUrls().stream().filter(turl -> turl.getShortUrl().equals(shortUrl)).collect(Collectors.toList());
+				if(tinyUrls!=null && !tinyUrls.isEmpty()) {
+					tinyURL =tinyUrls.get(0);
+					tinyURL.setLastModifiedTime(new Date());
+				}
 			}
-			
-			TinyURL tinyURL = tinyURLService.createNewTinyURL(tinyURLDTO, globalTinyURL.getShortUrl());
+			if(tinyURL == null) {
+				tinyURL = tinyURLService.createNewTinyURL(tinyURLDTO, globalTinyURL.getShortUrl());
+			}
 			user.addTinyURL(tinyURL);
 			userRepository.save(user);
 			return globalTinyURL;
 
 		}
-
 		return globalTinyURL;
 	}
 
@@ -80,7 +94,5 @@ public class UserServiceImpl implements UserService {
 	private GlobalTinyURL createNewGlobalTinyURL(TinyURLDTO tinyURLDTO) {
 		return globalTinyURLService.createGlobalTinyURL(tinyURLDTO);
 	}
-
-	
 
 }
