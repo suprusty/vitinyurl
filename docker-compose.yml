@@ -1,0 +1,42 @@
+version: '3.7'
+services:
+  mysql:
+    image: mysql/mysql-server:8.0
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: dummypassword 
+      MYSQL_USER: vitinyurl-user
+      MYSQL_PASSWORD: dummyevitinyurl
+      MYSQL_DATABASE: vitinyurl
+    volumes:
+      - mysql-database-data-volume:/var/lib/mysql
+    networks:
+      - vitinyurl-web-application-network  
+      
+      
+  vitinyurl-svc:
+    #image: virtualidentity/vitinyurl-svc:1.0.0
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on: 
+      - mysql 
+    environment:
+      RDS_HOSTNAME: mysql
+      RDS_PORT: 3306
+      RDS_DB_NAME: vitinyurl
+      RDS_USERNAME: vitinyurl-user
+      RDS_PASSWORD: dummyevitinyurl
+    networks:
+      - vitinyurl-web-application-network 
+# Volumes
+volumes:
+  mysql-database-data-volume:
+
+networks:
+  vitinyurl-web-application-network:
