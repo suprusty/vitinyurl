@@ -64,7 +64,7 @@ public class User {
 
 	public void addTinyURL(TinyURL tinyURL) {
 		if (tinyURL != null) {
-			if (tinyUrls == null) {
+			if (tinyUrls == null){
 				tinyUrls = new ArrayList<>();
 			}
 			Set<User> users = new HashSet<>();

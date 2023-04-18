@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
 					tinyURL.setLastModifiedTime(new Date());
 				}
 			}
-			if(tinyURL == null) {
+			if(tinyURL == null){
 				tinyURL = tinyURLService.createNewTinyURL(tinyURLDTO, globalTinyURL.getShortUrl());
 			}
 			user.addTinyURL(tinyURL);
